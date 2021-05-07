@@ -6,7 +6,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
-from modules import cow
+from selenium.webdriver.common.action_chains import ActionChains
+from modules import cow,evaluate
 
 def driverSetup():
     options = Options()
@@ -51,8 +52,10 @@ def get_latest_msg():
 def select_chat(chat_name):
     driver.find_element_by_xpath("//div[@id='side']/div[1]/div/label/div/div[2]").send_keys(chat_name + Keys.ENTER)
 
-def send_msg(driver,text):
-    driver.find_element_by_xpath("//footer/div[1]/div[2]/div/div[2]").send_keys(text)
+def send_msg(text):
+    for part in text.split('\n'):
+        driver.find_element_by_xpath("//footer/div[1]/div[2]/div/div[2]").send_keys(part)
+        ActionChains(driver).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
     driver.find_element_by_xpath("//footer/div[1]/div[3]/button/span").click()
 
 def active_chat_last():
@@ -74,9 +77,13 @@ def polling():
     text_catch = get_latest_msg()[0]
     if get_latest_msg()[2] == "Me":
         if "." in text_catch[0]:
-            print(text_catch)
-            if text_catch == ".cow":
-                cow()
+            command = text_catch.split(".",1)[1].split(" ",1)[0]
+            try:
+                args = text_catch.split(".",1)[1].split(" ",1)[1]
+            except:
+                args = ""
+            print(command, args)
+            eval(command+"."+command+"()")
         while text_catch == get_latest_msg()[0]:
             pass
     time.sleep(1)
