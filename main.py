@@ -1,4 +1,4 @@
-import selenium, time, json
+import selenium, time, json, asyncio,os
 from threading import Thread
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from modules import cow,evaluate
+from modules import cow,evaluate,ripaud,ripvid
 
 def driverSetup():
     options = Options()
@@ -72,18 +72,25 @@ def active_chat_last():
         last_msg_sender = "me"
     print(last_msg,"\n",last_msg_sender,"\n",last_msg_time,"\n",is_replied)
 
+def send_media(rpath):
+    driver.find_element_by_xpath("//span[@data-testid='clip']").click()
+    driver.find_element_by_xpath("//span[@data-testid='attach-image']/following-sibling::input").send_keys(os.path.abspath(rpath))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
+    driver.find_element_by_xpath("//span[@data-testid='send']").click()
+
 def polling():
     get_nth_chat(0).click()
     text_catch = get_latest_msg()[0]
+    print(text_catch)
     if get_latest_msg()[2] == "Me":
         if "." in text_catch[0]:
             command = text_catch.split(".",1)[1].split(" ",1)[0]
+            print(command)
             try:
                 args = text_catch.split(".",1)[1].split(" ",1)[1]
             except:
                 args = ""
-            print(command, args)
-            eval(command+"."+command+"()")
+            eval(command+"."+command+"('"+args+"')")
         while text_catch == get_latest_msg()[0]:
             pass
     time.sleep(1)

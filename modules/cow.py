@@ -1,10 +1,10 @@
 import main
 
-def cow():
+def cow(placebo):
     main.send_msg("""```
  ____________________________
-/ Cow is full of bs          \\
-\             - kalon 2020   /
+/ Cow Module bullshit        \\
+\               - jeel 2021  /
  ----------------------------
         \   ^__^
          \  (oo)\_______
