@@ -12,3 +12,7 @@ def cow(placebo):
                 ||----w |
                 ||     ||
 ```""")
+
+
+def help():
+    main.send_msg("```just a placebo module to check if the bot is alive.```")
