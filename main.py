@@ -11,7 +11,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 
 #import cutoms mods from list
-mods=['cow','evaluate','ripaud','ripvid','help']
+mods=['cow','evaluate','ripaud','ripvid','help','dl']
 
 for lib in mods:
     globals()[lib] = importlib.import_module("modules."+lib)
@@ -120,15 +120,8 @@ def helpinside(command):
     if command in mods:
         eval(command+".help()")
 
-def scanqr():
-    driver.get("https://web.whatsapp.com")
-    time.sleep(1)
-    driver.get_screenshot_as_file("screenshot.png")
-    time.sleep(5)
-
 if __name__ == "__main__":
     print("module imported")
 else:
     driverSetup()
-    scanqr()
     Thread(target=polling).start()
