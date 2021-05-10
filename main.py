@@ -11,7 +11,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 
 #import cutoms mods from list
-mods=['cow','evaluate','ripaud','ripvid','help','dl']
+mods=['cow','evaluate','ripaud','ripvid','help','dl','getsticker']
 
 for lib in mods:
     globals()[lib] = importlib.import_module("modules."+lib)
@@ -28,42 +28,42 @@ def driverSetup():
     options.add_argument("--allow-running-insecure-content")
     global driver
     driver = webdriver.Chrome(executable_path='./chromedriver', options=options)
+    driver.get("https://web.whatsapp.com")
 
 def get_nth_chat(n):
     chatpixels = n*72
-    # WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@aria-label='Chat list']")))
     nthchat = driver.find_element_by_xpath(f"//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY({chatpixels}px)')]/div/div/div[2]/div[1]/div[1]/span")
-    print(nthchat.text)
     return nthchat
 
 def get_latest_msg():
-    if "typing" in driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span").text:
-        latest_msg=""
-        chat_type=""
-        latest_msg_from=""
-    else:
+    try:
+        latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span").text
         try:
-            latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span").text
-            try:
-                driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/div/span[@data-testid='status-check']")
-                latest_msg_from = "Me"
-            except:
-                driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/div/span[@data-testid='status-dblcheck']")
-                latest_msg_from = "Me"
-            chat_type = "noidea"
+            driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/div/span[@data-testid='status-check']")
+            latest_msg_from = "Me"
+        except:
+            driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/div/span[@data-testid='status-dblcheck']")
+            latest_msg_from = "Me"
+        chat_type = "noidea"
+    except:
+        try:
+            latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span[3]").text
+            latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span[1]").text
+            chat_type = "group"
         except:
             try:
-                latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span[3]").text
-                latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span[1]").text
-                chat_type = "group"
-            except:
                 latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span").text
                 chat_type = "personal"
                 latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[1]/div[1]/span").text
-            else:
-                latest_msg=""
-                chat_type=""
-                latest_msg_from=""
+            except:
+                latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span").text
+                if latest_msg == "typing...":
+                    chat_type = "personal"
+                    latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[1]/div[1]/span").text
+                else:
+                    chat_type = "group"
+                    latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span").text.split(" ")[0]
+
     return(latest_msg,chat_type,latest_msg_from)
 
 def select_chat(chat_name):
@@ -79,21 +79,46 @@ def active_chat_last():
     last_msg = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()]").text
     try:
         driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()-1]").text
+        replied_text = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()-1]/div/div/div/div/div[2]").text
+        replier = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()-1]/div/div/div/div/div[1]").text
         is_replied = True
     except:
+        replied_text = None
         is_replied = False
     last_msg_time = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()]").text
     try:
         last_msg_sender = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-2]").text
     except:
         last_msg_sender = "me"
-    print(last_msg,"\n",last_msg_sender,"\n",last_msg_time,"\n",is_replied)
+    if is_replied == True:
+        return(last_msg,last_msg_sender,last_msg_time,is_replied,replied_text, replier)
+    else:
+        return(last_msg,last_msg_sender,last_msg_time,is_replied)
+
+def stickers():
+    try:
+        driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()-1]/div/div/div/div/div[2]/span/div")
+        sticker_uri = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()-1]/div/div/div/div/div[2]/span/div/img").get_attribute("src")
+        is_animated = True
+    except:
+        sticker_uri = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()-1]/div/div/div/div/div[2]/span/img").get_attribute("src")
+        is_animated = False
+    return(sticker_uri,is_animated)
+
 
 def send_media(rpath):
     driver.find_element_by_xpath("//span[@data-testid='clip']").click()
     driver.find_element_by_xpath("//span[@data-testid='attach-image']/following-sibling::input").send_keys(os.path.abspath(rpath))
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
     driver.find_element_by_xpath("//span[@data-testid='send']").click()
+
+
+def send_doc(rpath):
+    driver.find_element_by_xpath("//span[@data-testid='clip']").click()
+    driver.find_element_by_xpath("//span[@data-testid='attach-document']/following-sibling::input").send_keys(os.path.abspath(rpath))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
+    driver.find_element_by_xpath("//span[@data-testid='send']").click()
+
 
 def polling():
     get_nth_chat(0).click()
@@ -107,12 +132,16 @@ def polling():
                     try:
                         args = text_catch.split(".",1)[1].split(" ",1)[1]
                     except:
-                        args = ""
+                        if active_chat_last()[3] == True:
+                            args = active_chat_last()[4]
+                        else:
+                            args = ""
                     eval(command+"."+command+"('"+args+"')")
-            while text_catch == get_latest_msg()[0]:
-                pass
         except:
             pass
+        while text_catch == get_latest_msg()[0]:
+            pass
+        
     time.sleep(1)
     polling()
 
@@ -124,4 +153,5 @@ if __name__ == "__main__":
     print("module imported")
 else:
     driverSetup()
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@aria-label='Chat list']")))
     Thread(target=polling).start()
