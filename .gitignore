@@ -3,3 +3,4 @@ screenshot.png
 __pycache__
 *.pyc
 YTDL/
+test*

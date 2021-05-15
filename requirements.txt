@@ -1,3 +1,4 @@
 selenium
 youtube_dl
 file-downloader
+spotipy

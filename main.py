@@ -1,4 +1,4 @@
-import selenium, time, json, asyncio,os,importlib
+import selenium, time, json,os,importlib,sys,socketserver,http.server
 from threading import Thread
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -11,15 +11,22 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 
 #import cutoms mods from list
-mods=['cow','evaluate','ripaud','ripvid','help','dl','getsticker']
+mods=['cow','evaluate','ripaud','ripvid','help','dl','getsticker','fuckyou']
 
 for lib in mods:
     globals()[lib] = importlib.import_module("modules."+lib)
 
+#PORT = int(sys.argv[1])
+
+#def screenshot_server():
+#    print("THREAD STARTED")
+#    with socketserver.TCPServer(("0.0.0.0", PORT), http.server.SimpleHTTPRequestHandler) as httpd:
+#        print("Server started at localhost:" + str(PORT))
+#        httpd.serve_forever()
 
 def driverSetup():
     options = Options()
-    # options.add_argument('--headless')
+ #   options.add_argument('--headless')
     options.add_argument('--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36 Edge/46.1.2.5140"')
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--user-data-dir=chrome-data")
@@ -28,7 +35,6 @@ def driverSetup():
     options.add_argument("--allow-running-insecure-content")
     global driver
     driver = webdriver.Chrome(executable_path='./chromedriver', options=options)
-    driver.get("https://web.whatsapp.com")
 
 def get_nth_chat(n):
     chatpixels = n*72
@@ -121,29 +127,35 @@ def send_doc(rpath):
 
 
 def polling():
-    get_nth_chat(0).click()
-    text_catch = get_latest_msg()[0]
-    if get_latest_msg()[2] == "Me":
-        try:
-            if "." in text_catch[0]:
-                command = text_catch.split(".",1)[1].split(" ",1)[0]
-                if command in mods:
-                    print(command)
-                    try:
-                        args = text_catch.split(".",1)[1].split(" ",1)[1]
-                    except:
-                        if active_chat_last()[3] == True:
-                            args = active_chat_last()[4]
-                        else:
-                            args = ""
-                    eval(command+"."+command+"('"+args+"')")
-        except:
-            pass
-        while text_catch == get_latest_msg()[0]:
-            pass
-        
-    time.sleep(1)
-    polling()
+    while True:
+        text_catch = get_latest_msg()[0]
+        if get_latest_msg()[2] == "Me":
+            get_nth_chat(0).click()
+            try:
+                if "." in text_catch[0]:
+                    command = text_catch.split(".",1)[1].split(" ",1)[0]
+                    if command in mods:
+                        print(command)
+                        try:
+                            args = text_catch.split(".",1)[1].split(" ",1)[1]
+                        except:
+                            if active_chat_last()[3] == True:
+                                args = active_chat_last()[4]
+                            else:
+                                args = ""
+                        eval(command+"."+command+"('"+args+"')")
+            except:
+                pass
+            while text_catch == get_latest_msg()[0]:
+                pass
+
+def scan_qr():
+    driver.get("https://web.whatsapp.com")
+    time.sleep(2)
+    # WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//div[@id='initial_startup']")))
+    driver.save_screenshot('screenshot.png')
+    print("screenshot taken")
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//div[@aria-label='Chat list']")))
 
 def helpinside(command):
     if command in mods:
@@ -153,5 +165,6 @@ if __name__ == "__main__":
     print("module imported")
 else:
     driverSetup()
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@aria-label='Chat list']")))
+ #   Thread(target=screenshot_server).start()
+    scan_qr()
     Thread(target=polling).start()
