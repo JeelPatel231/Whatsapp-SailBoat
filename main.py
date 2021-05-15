@@ -11,7 +11,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 
 #import cutoms mods from list
-mods=['cow','evaluate','ripaud','ripvid','help','dl','getsticker','fuckyou']
+mods=['cow','evaluate','ripaud','ripvid','help','dl','getsticker','fuckyou','gimg']
 
 for lib in mods:
     globals()[lib] = importlib.import_module("modules."+lib)
@@ -115,16 +115,14 @@ def stickers():
 def send_media(rpath):
     driver.find_element_by_xpath("//span[@data-testid='clip']").click()
     driver.find_element_by_xpath("//span[@data-testid='attach-image']/following-sibling::input").send_keys(os.path.abspath(rpath))
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
-    driver.find_element_by_xpath("//span[@data-testid='send']").click()
-
 
 def send_doc(rpath):
     driver.find_element_by_xpath("//span[@data-testid='clip']").click()
     driver.find_element_by_xpath("//span[@data-testid='attach-document']/following-sibling::input").send_keys(os.path.abspath(rpath))
+
+def click_send():
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
     driver.find_element_by_xpath("//span[@data-testid='send']").click()
-
 
 def polling():
     while True:

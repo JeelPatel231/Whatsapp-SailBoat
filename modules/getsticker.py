@@ -29,6 +29,7 @@ def getsticker(lol):
         f.write(bytes)
         f.close()
         main.send_doc("sticker/sticker.gif")
+    main.click_send()
 
 def help():
     main.send_msg("""

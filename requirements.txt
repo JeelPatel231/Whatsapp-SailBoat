@@ -2,3 +2,4 @@ selenium
 youtube_dl
 file-downloader
 spotipy
+beautifulsoup4
