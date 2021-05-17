@@ -1,4 +1,4 @@
-import selenium, time, json,os,importlib,sys,socketserver,http.server
+import selenium, time, json,os,importlib,sys,socketserver,http.server,base64
 from threading import Thread
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -10,8 +10,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 
 
-#import cutoms mods from list
-mods=['cow','evaluate','ripaud','ripvid','help','dl','getsticker','fuckyou','gimg']
+# import cutoms mods from list   
+mods=['cow','evaluate','ripaud','ripvid','help','dl','getsticker','fuckyou','gimg','reverse','rbg']
 
 for lib in mods:
     globals()[lib] = importlib.import_module("modules."+lib)
@@ -26,7 +26,7 @@ for lib in mods:
 
 def driverSetup():
     options = Options()
- #   options.add_argument('--headless')
+    #   options.add_argument('--headless')
     options.add_argument('--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36 Edge/46.1.2.5140"')
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--user-data-dir=chrome-data")
@@ -111,6 +111,9 @@ def stickers():
         is_animated = False
     return(sticker_uri,is_animated)
 
+def replied_media():
+    photo_uri = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()-1]/div/div/div[2]/div/div/div[2]/div").get_attribute("style").split("\"")[1]
+    return photo_uri
 
 def send_media(rpath):
     driver.find_element_by_xpath("//span[@data-testid='clip']").click()
@@ -123,6 +126,22 @@ def send_doc(rpath):
 def click_send():
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
     driver.find_element_by_xpath("//span[@data-testid='send']").click()
+
+def get_file_content_chrome(uri):
+  result = driver.execute_async_script("""
+    var uri = arguments[0];
+    var callback = arguments[1];
+    var toBase64 = function(buffer){for(var r,n=new Uint8Array(buffer),t=n.length,a=new Uint8Array(4*Math.ceil(t/3)),i=new Uint8Array(64),o=0,c=0;64>c;++c)i[c]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".charCodeAt(c);for(c=0;t-t%3>c;c+=3,o+=4)r=n[c]<<16|n[c+1]<<8|n[c+2],a[o]=i[r>>18],a[o+1]=i[r>>12&63],a[o+2]=i[r>>6&63],a[o+3]=i[63&r];return t%3===1?(r=n[t-1],a[o]=i[r>>2],a[o+1]=i[r<<4&63],a[o+2]=61,a[o+3]=61):t%3===2&&(r=(n[t-2]<<8)+n[t-1],a[o]=i[r>>10],a[o+1]=i[r>>4&63],a[o+2]=i[r<<2&63],a[o+3]=61),new TextDecoder("ascii").decode(a)};
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = function(){ callback(toBase64(xhr.response)) };
+    xhr.onerror = function(){ callback(xhr.status) };
+    xhr.open('GET', uri);
+    xhr.send();
+    """, uri)
+  if type(result) == int :
+    raise Exception("Request failed with status %s" % result)
+  return base64.b64decode(result)
 
 def polling():
     while True:
@@ -141,6 +160,7 @@ def polling():
                                 args = active_chat_last()[4]
                             else:
                                 args = ""
+                        print(args )
                         eval(command+"."+command+"('"+args+"')")
             except:
                 pass
