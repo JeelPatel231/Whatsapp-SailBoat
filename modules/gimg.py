@@ -12,10 +12,10 @@ def gimg(args):
         if "data-src" in str(source):
             avail_sources.append(str(source.get("data-src")))
     for link in avail_sources[:5]:
-        open('download.png', 'wb').write(requests.get(link, allow_redirects=True).content)
-        main.send_media('download.png')
-        main.time.sleep(1)
+        open('download/download.png', 'wb').write(requests.get(link, allow_redirects=True).content)
+        main.send_media('download/download.png')
         main.click_send()
+        main.time.sleep(1)
 
 def help():
     main.send_msg("```Searches and sends back images of the text input```")

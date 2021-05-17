@@ -3,3 +3,4 @@ youtube_dl
 file-downloader
 spotipy
 beautifulsoup4
+youtube-search
