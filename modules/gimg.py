@@ -14,7 +14,6 @@ def gimg(args):
     for link in avail_sources[:5]:
         open('download/download.png', 'wb').write(requests.get(link, allow_redirects=True).content)
         main.send_media('download/download.png')
-        main.click_send()
         main.time.sleep(1)
 
 def help():

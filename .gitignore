@@ -4,3 +4,6 @@ __pycache__
 *.pyc
 YTDL/
 test*
+*.png
+*.jpg
+*.gif

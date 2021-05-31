@@ -15,7 +15,6 @@ def getsticker(lol):
         ext = "sticker.gif"
     if lol == "":
       main.send_media(f'sticker/{ext}')
-      main.click_send()
     else:
       return ext
 

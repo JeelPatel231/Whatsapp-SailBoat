@@ -23,6 +23,5 @@ def rbg(args):
         with open('sticker/no-bg.png', 'wb') as out:
             out.write(response.content)
         main.send_media('sticker/no-bg.png')
-        main.click_send()
     else:
-        print("Error:", response.status_code, response.text)
+        main.send_msg("Error:", response.status_code, response.text)

@@ -11,7 +11,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 
 # import cutoms mods from list   
-mods=['cow','evaluate','ripaud','ripvid','help','dl','getsticker','fuckyou','gimg','reverse','rbg']
+mods=['cow','evaluate','ripaud','ripvid','help','getsticker','fuckyou','gimg','reverse','rbg','reddit']
 
 for lib in mods:
     globals()[lib] = importlib.import_module("modules."+lib)
@@ -38,37 +38,37 @@ def driverSetup():
 
 def get_nth_chat(n):
     chatpixels = n*72
-    nthchat = driver.find_element_by_xpath(f"//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY({chatpixels}px)')]/div/div/div[2]/div[1]/div[1]/span")
+    nthchat = driver.find_element_by_xpath(f"//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY({chatpixels}px)')]/div/div/div[2]/div[1]/div[1]/span")
     return nthchat
 
 def get_latest_msg():
     try:
-        latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span").text
+        latest_msg = driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span").text
         try:
-            driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/div/span[@data-testid='status-check']")
+            driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/div/span[@data-testid='status-check']")
             latest_msg_from = "Me"
         except:
-            driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/div/span[@data-testid='status-dblcheck']")
+            driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/div/span[@data-testid='status-dblcheck']")
             latest_msg_from = "Me"
         chat_type = "noidea"
     except:
         try:
-            latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span[3]").text
-            latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span[1]").text
+            latest_msg = driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span[3]").text
+            latest_msg_from = driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span[1]").text
             chat_type = "group"
         except:
             try:
-                latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span").text
+                latest_msg = driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span/span").text
                 chat_type = "personal"
-                latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[1]/div[1]/span").text
+                latest_msg_from = driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[1]/div[1]/span").text
             except:
-                latest_msg = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span").text
+                latest_msg = driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span").text
                 if latest_msg == "typing...":
                     chat_type = "personal"
-                    latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[1]/div[1]/span").text
+                    latest_msg_from = driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[1]/div[1]/span").text
                 else:
                     chat_type = "group"
-                    latest_msg_from = driver.find_element_by_xpath("//div[@aria-label='Chat list']/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span").text.split(" ")[0]
+                    latest_msg_from = driver.find_element_by_xpath("//div[@id='pane-side']/div[1]/div/div/div[contains(@style,'transform: translateY(0px)')]/div/div/div[2]/div[2]/div[1]/span").text.split(" ")[0]
 
     return(latest_msg,chat_type,latest_msg_from)
 
@@ -118,12 +118,12 @@ def replied_media():
 def send_media(rpath):
     driver.find_element_by_xpath("//span[@data-testid='clip']").click()
     driver.find_element_by_xpath("//span[@data-testid='attach-image']/following-sibling::input").send_keys(os.path.abspath(rpath))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
+    driver.find_element_by_xpath("//span[@data-testid='send']").click()
 
 def send_doc(rpath):
     driver.find_element_by_xpath("//span[@data-testid='clip']").click()
     driver.find_element_by_xpath("//span[@data-testid='attach-document']/following-sibling::input").send_keys(os.path.abspath(rpath))
-
-def click_send():
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
     driver.find_element_by_xpath("//span[@data-testid='send']").click()
 
@@ -144,7 +144,7 @@ def get_file_content_chrome(uri):
   return base64.b64decode(result)
 
 def polling():
-    while True:
+    # while True:
         text_catch = get_latest_msg()[0]
         if get_latest_msg()[2] == "Me":
             get_nth_chat(0).click()
@@ -166,6 +166,7 @@ def polling():
                 pass
             while text_catch == get_latest_msg()[0]:
                 pass
+        polling()
 
 def scan_qr():
     driver.get("https://web.whatsapp.com")
@@ -173,7 +174,7 @@ def scan_qr():
     # WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//div[@id='initial_startup']")))
     driver.save_screenshot('screenshot.png')
     print("screenshot taken")
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//div[@aria-label='Chat list']")))
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//div[@id='pane-side']/div[1]/div/div")))
 
 def helpinside(command):
     if command in mods:

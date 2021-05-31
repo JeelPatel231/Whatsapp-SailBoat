@@ -19,7 +19,7 @@ def ripaud(context):
             os.remove("YTDL/ytdlaudio.mp3")
         except:
             pass
-        if "http://" or "https://" not in str(context):
+        if "://" not in str(context):
             results = ys(context, max_results=1).to_dict()
             youtubeurl = 'youtube.com' + results[0]['url_suffix']
             print(youtubeurl)
@@ -34,7 +34,6 @@ def ripaud(context):
                 ydl.download(list)
             main.send_msg("download finished, sending audio..")
             main.send_media("YTDL/ytdlaudio.mp3")
-            main.click_send()
         except youtube_dl.utils.DownloadError as e:
             main.send_msg(str(e))
 
