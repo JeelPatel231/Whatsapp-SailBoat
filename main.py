@@ -7,11 +7,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from dotenv import load_dotenv
 
+load_dotenv()
 
+print(os.environ['REM_BG_API'])
 
 # import cutoms mods from list   
-mods=['cow','evaluate','ripaud','ripvid','help','getsticker','fuckyou','gimg','reverse','rbg','reddit']
+mods=['cow','calc','ripaud','ripvid','help','getsticker','fuckyou','gimg','yrev','grev','rbg','reddit','mmf','mal']
 
 for lib in mods:
     globals()[lib] = importlib.import_module("modules."+lib)
@@ -113,7 +116,10 @@ def stickers():
 
 def replied_media():
     photo_uri = driver.find_element_by_xpath("//div[@role='region']/div[last()]/div/div/div/div[last()-1]/div[last()-1]/div/div/div[2]/div/div/div[2]/div").get_attribute("style").split("\"")[1]
-    return photo_uri
+    bytes = get_file_content_chrome(photo_uri)
+    f = open("sticker/replied.png","wb")
+    f.write(bytes)
+    f.close()
 
 def send_media(rpath):
     driver.find_element_by_xpath("//span[@data-testid='clip']").click()
@@ -125,6 +131,15 @@ def send_doc(rpath):
     driver.find_element_by_xpath("//span[@data-testid='clip']").click()
     driver.find_element_by_xpath("//span[@data-testid='attach-document']/following-sibling::input").send_keys(os.path.abspath(rpath))
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
+    driver.find_element_by_xpath("//span[@data-testid='send']").click()
+
+def media_with_caption(rpath,caption):
+    driver.find_element_by_xpath("//span[@data-testid='clip']").click()
+    driver.find_element_by_xpath("//span[@data-testid='attach-image']/following-sibling::input").send_keys(os.path.abspath(rpath))
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[@data-testid='send']")))
+    for part in caption.split('\n'):
+        driver.find_element_by_xpath("//div[@data-animate-media-caption='true']/div/div[3]/div[1]/div[2]").send_keys(part)
+        ActionChains(driver).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
     driver.find_element_by_xpath("//span[@data-testid='send']").click()
 
 def get_file_content_chrome(uri):
@@ -144,12 +159,12 @@ def get_file_content_chrome(uri):
   return base64.b64decode(result)
 
 def polling():
-    # while True:
+    while True:
         text_catch = get_latest_msg()[0]
         if get_latest_msg()[2] == "Me":
-            get_nth_chat(0).click()
             try:
                 if "." in text_catch[0]:
+                    get_nth_chat(0).click()
                     command = text_catch.split(".",1)[1].split(" ",1)[0]
                     if command in mods:
                         print(command)
@@ -166,7 +181,6 @@ def polling():
                 pass
             while text_catch == get_latest_msg()[0]:
                 pass
-        polling()
 
 def scan_qr():
     driver.get("https://web.whatsapp.com")

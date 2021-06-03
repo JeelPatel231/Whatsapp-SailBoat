@@ -8,7 +8,7 @@ def rbg(args):
         f = open("sticker/remove.png","wb")
         f.write(bytes)
         f.close()
-        name = "sticker/remove.png"
+        name = "sticker/replied.png"
     except:
         name = "sticker/" + getsticker("x") 
     print(name)

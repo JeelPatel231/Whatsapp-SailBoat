@@ -4,3 +4,5 @@ file-downloader
 spotipy
 beautifulsoup4
 youtube-search
+pillow
+python-dotenv
