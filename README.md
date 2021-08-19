@@ -23,5 +23,6 @@ Simply uses selenium automation.
 Inspired from many Telegram-Userbots, I am making this one for WhatsApp.
 
 ## How do I use it?
+![That's the neat part, you don't!](https://i.ytimg.com/vi/8Jul5SuPYJc/maxresdefault.jpg)
 
-YOU DON'T, not yet atleast.
+_Just kidding, wait for me to be done with the documentation._
